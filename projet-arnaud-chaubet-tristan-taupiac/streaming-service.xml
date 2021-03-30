@@ -1,1 +1,45 @@
-
+<streaming-service name="Netflix">
+        <medias>
+                <media name="Steins;Gate" type="anime">
+                        <qualities>
+                                <quality>low</quality>
+                                <quality>medium</quality>
+                                <quality>high</quality>
+                        </qualities>
+                        <rating>9.0</rating>
+                        <year>2011</year>
+                </media>
+                <media name="The Matrix" type="film">
+                        <qualities>
+                                <quality>low</quality>
+                                <quality>medium</quality>
+                        </qualities>
+                        <rating>8.9</rating>
+                        <year>1999</year>
+                </media>
+                <media name="The Matrix Reloaded" type="film">
+                        <qualities>
+                                <quality>low</quality>
+                                <quality>medium</quality>
+                        </qualities>
+                        <rating>7.8</rating>
+                        <year>2003</year>
+                </media>
+                <media name="The Matrix Revolutions" type="film">
+                        <qualities>
+                                <quality>low</quality>
+                                <quality>medium</quality>
+                        </qualities>
+                        <rating>6.7</rating>
+                        <year>2003</year>
+                </media>
+                <media name="Family Matters" type="series">
+                        <qualities>
+                                <quality>low</quality>
+                        </qualities>
+                        <rating>6.6</rating>
+                        <year>1989</year>
+                </media>
+        </medias>
+        <web>https://www.netflix.com/</web>
+</streaming-service>
