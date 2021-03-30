@@ -8,3 +8,7 @@ streaming_service_t::streaming_service_t(){
 string streaming_service_t::get_name() const{
   return this->name;
 }
+
+string streaming_service_t::get_web() const{
+  return this->web;
+}
