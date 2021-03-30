@@ -5,3 +5,6 @@ streaming_service_t::streaming_service_t(){
   this->web = "undefined";
 }
 
+string streaming_service_t::get_name() const{
+  return this->name;
+}
