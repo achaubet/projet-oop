@@ -20,22 +20,28 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
 
   char **endptr = NULL;
   for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
-    if(strcmp(media_name.name(), "name")==0){
+    if(strcmp(media_name.name(), "name") == 0){
       media_type.set_name(media_name.value());
     }
   }
   for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
-    if(strcmp(media_info.name(), "qualities")){
+    if(strcmp(media_info.name(), "qualities") == 0){
       for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
-        if(strcmp(quality.child_value(), "low")){media_type.qualities_push_back(low);}
-        if(strcmp(quality.child_value(), "medium")){media_type.qualities_push_back(medium);}
-        if(strcmp(quality.child_value(), "high")){media_type.qualities_push_back(high);}
+        if(strcmp(quality.child_value(), "low") == 0){
+          media_type.qualities_push_back(low);
+        }
+        if(strcmp(quality.child_value(), "medium") == 0){
+          media_type.qualities_push_back(medium);
+        }
+        if(strcmp(quality.child_value(), "high") == 0){
+          media_type.qualities_push_back(high);
+        }
       }
     }
-    if(strcmp(media_info.name(), "rating")){
+    if(strcmp(media_info.name(), "rating") == 0){
       media_type.set_rating(strtof(media_info.child_value(),endptr));  // Try ... Catch ICI (Si echec, retouner 1)
     }
-    if(strcmp(media_info.name(), "year")){
+    if(strcmp(media_info.name(), "year") == 0){
       media_type.set_year(strtol(media_info.child_value(), endptr, 10)); // try ... catch ICI
     }
   }
@@ -49,36 +55,41 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
   xml_node media;
   xml_attribute service_info;
   xml_attribute media_type;
-  anime_t anime;
-  series_t series;
-  film_t film;
+  anime_t *anime = NULL;
+  series_t *series = NULL;
+  film_t *film = NULL;
 
   node = doc.first_child();
   for(; node; node = node.next_sibling()){
-    if(strcmp(node.name(), "streaming-service")==0){
+    if(strcmp(node.name(), "streaming-service") == 0){
       for(service_info = node.first_attribute(); service_info; service_info = service_info.next_attribute()){
-        if(strcmp(service_info.name(), "name")==0){
+        if(strcmp(service_info.name(), "name") == 0){
           service.set_name(service_info.value());
         }
       }
       for(child_node = node.first_child(); child_node; child_node = child_node.next_sibling()){
-        if(strcmp(child_node.name(), "medias")==0){
+        if(strcmp(child_node.name(), "medias") == 0){
           for(media = child_node.first_child(); media; media = media.next_sibling()){
             for(media_type = media.first_attribute(); media_type; media_type = media_type.next_attribute()){ // Parcours de tous les medias
-
               if(strcmp(media_type.value(), "anime") == 0){
-                xml_browse_media(media, service, anime);
+                anime = new anime_t;
+                xml_browse_media(media, service, *anime);
+                delete anime;
               }
               if(strcmp(media_type.value(), "film") == 0){
-                xml_browse_media(media, service, film);
+                film = new film_t;
+                xml_browse_media(media, service, *film);
+                delete film;
               }
               if(strcmp(media_type.value(), "series") == 0){
-                xml_browse_media(media, service, series);
+                series = new series_t;
+                xml_browse_media(media, service, *series);
+                delete series;
               }
             }
           }
         }
-        if(strcmp(child_node.name(), "web")==0){
+        if(strcmp(child_node.name(), "web") == 0){
           service.set_web(child_node.child_value());
         }
       }

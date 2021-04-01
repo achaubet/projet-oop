@@ -98,7 +98,7 @@ ostream &operator<<(ostream &os, const media_t &media){
       case medium:os << "medium";break;
       case high:os << "high";break;
     }
-    i != ((media.qualities_size()+media.qualities_at(0)-1)) ? os << ", " : os << ")";
+    i != (((media.qualities_at(0)+media.qualities_size())-1)) ? os << ", " : os << ")";
   }
   os << ")";
   return os;
