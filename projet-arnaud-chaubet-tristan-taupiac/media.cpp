@@ -26,7 +26,7 @@ int media_t::get_year() const{
 }
 
 void media_t::handle_m() const{
-  cout << this;
+  cout << *this << endl;;
 }
 
 void media_t::handle_mn(string name) const{
@@ -97,7 +97,6 @@ ostream &operator<<(ostream &os, const media_t &media){
   for(; i < media.qualities_size()+media.qualities_at(0); i++){
     i != ((media.qualities_size()+media.qualities_at(0)-1)) ? os << qualities[i] << ", " : os << qualities[i] << ")";
   }
-  os << ")" << endl;
+  os << ")";
   return os;
 }
-

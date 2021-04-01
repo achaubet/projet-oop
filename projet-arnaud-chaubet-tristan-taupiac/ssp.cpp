@@ -9,11 +9,14 @@ using namespace std;
 using namespace pugi;
 
 int main(int argc, char const *argv[]) {
-
+  streaming_service_t netflix;
   anime_t anime;
   anime.qualities_push_back(medium);
   anime.qualities_push_back(high);
-  cout << anime;
+  netflix.set_name("Netflix");
+  netflix.set_web("https://www.netflix.com/");
+  netflix.medias_push_back(anime);
+  netflix.medias_push_back(anime);
+  netflix.handle_i();
   return 0;
 }
-
