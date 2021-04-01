@@ -26,7 +26,7 @@ int media_t::get_year() const{
 }
 
 void media_t::handle_m() const{
-  cout << *this << endl;;
+  cout << *this << endl;
 }
 
 void media_t::handle_mn(string name) const{
