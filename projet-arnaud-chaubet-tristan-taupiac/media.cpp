@@ -92,14 +92,14 @@ void media_t::set_year(int year){
 ostream &operator<<(ostream &os, const media_t &media){
   int i = 0;
   os << "("<< media.get_name() << ", " << media.get_year() << ", " << media.get_announcement() << ", " << media.get_rating() << ", (";
-  for(i = media.qualities_at(0); i < media.qualities_size()+media.qualities_at(0); i++){
-    switch(media.qualities_at(i)){
+  for(i = media.qualities_at(0); i < (media.qualities_size()+media.qualities_at(0)); i++){
+    switch(i){
       case low:os << "low";break;
       case medium:os << "medium";break;
       case high:os << "high";break;
-  }
+    }
     i != ((media.qualities_size()+media.qualities_at(0)-1)) ? os << ", " : os << ")";
-  } 
+  }
   os << ")";
   return os;
 }
