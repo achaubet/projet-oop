@@ -90,13 +90,13 @@ void media_t::set_year(int year){
 }
 
 ostream &operator<<(ostream &os, const media_t &media){
-  int i = media.qualities_at(0);
+  //int i = 0;
   vector<string> qualities;
   qualities.push_back("low"); qualities.push_back("medium"); qualities.push_back("high");
   os << "("<< media.get_name() << ", " << media.get_year() << ", " << media.get_announcement() << ", " << media.get_rating() << ", (";
-  for(; i < media.qualities_size()+media.qualities_at(0); i++){
+  /*for(i = media.qualities_at(0); i < media.qualities_size()+media.qualities_at(0); i++){
     i != ((media.qualities_size()+media.qualities_at(0)-1)) ? os << qualities[i] << ", " : os << qualities[i] << ")";
-  }
+  } */ //SegFault ICI
   os << ")";
   return os;
 }
