@@ -38,7 +38,7 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       }
     }
     if(strcmp(media_info.name(), "rating") == 0){
-      media_type.set_rating(strtof(media_info.child_value(),endptr));  // Try ... Catch ICI (Si echec, retouner 1)
+      media_type.set_rating(strtof(media_info.child_value(),endptr));  // Try ... Catch ICI (Si echec, retouner -1)
     }
     if(strcmp(media_info.name(), "year") == 0){
       media_type.set_year(strtol(media_info.child_value(), endptr, 10)); // try ... catch ICI
@@ -49,13 +49,12 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   }
   catch(bad_alloc &e){
     cerr << "An exception occured, cannot add media to streaming-service, reason: " << e.what() << endl;
-    return 1;
+    return -1;
   }
   return 0;
 }
 
 int xml_browse(xml_document &doc, streaming_service_t &service){
-  int err = 0;
   xml_node node;
   xml_node child_node;
   xml_node media;
@@ -76,18 +75,45 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
           for(media = child_node.first_child(); media; media = media.next_sibling()){
             for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Parcours de tous les medias
               if(strcmp(media_type_attr.value(), "anime") == 0){
-                media_type_ptr = new anime_t;
-                 err = xml_browse_media(media, service, *media_type_ptr);
+                try{
+                  media_type_ptr = new anime_t;
+                }
+                catch(bad_alloc &e){
+                  cerr << "An exception occurred, cannot allocate a new anime, reason: " << e.what() << endl;
+                  return -1;
+                }
+                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                  delete media_type_ptr;
+                  return -1;
+                }
                 delete media_type_ptr;
               }
               if(strcmp(media_type_attr.value(), "film") == 0){
-                media_type_ptr = new film_t;
-                err = xml_browse_media(media, service, *media_type_ptr);
+                try{
+                  media_type_ptr = new film_t;
+                }
+                catch(bad_alloc &e){
+                  cerr << "An exception occurred, cannot allocate a new film, reason: " << e.what() << endl;
+                  return -1;
+                }
+                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                  delete media_type_ptr;
+                  return -1;
+                }
                 delete media_type_ptr;
               }
               if(strcmp(media_type_attr.value(), "series") == 0){
-                media_type_ptr = new series_t;
-                err = xml_browse_media(media, service, *media_type_ptr);
+                try{
+                  media_type_ptr = new series_t;
+                }
+                catch(bad_alloc &e){
+                  cerr << "An exception occurred, cannot allocate a new series, reason: " << e.what() << endl;
+                  return -1;
+                }
+                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                  delete media_type_ptr;
+                  return -1;
+                }
                 delete media_type_ptr;
               }
             }
@@ -99,7 +125,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
       }
     }
   }
-  return err;
+  return 0;
 }
 
 int main(int argc, char const *argv[]) {
