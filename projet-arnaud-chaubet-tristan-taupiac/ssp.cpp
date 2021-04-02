@@ -17,7 +17,6 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   xml_node media_info;
   xml_node quality;
   xml_attribute media_name;
-
   char **endptr = NULL;
   for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
     if(strcmp(media_name.name(), "name") == 0){
@@ -45,19 +44,24 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       media_type.set_year(strtol(media_info.child_value(), endptr, 10)); // try ... catch ICI
     }
   }
-  service.medias_push_back(media_type);
+  try{
+    service.medias_push_back(media_type);
+  }
+  catch(bad_alloc &e){
+    cerr << "An exception occured, cannot add media to streaming-service, reason: " << e.what() << endl;
+    return 1;
+  }
   return 0;
 }
 
 int xml_browse(xml_document &doc, streaming_service_t &service){
+  int err = 0;
   xml_node node;
   xml_node child_node;
   xml_node media;
   xml_attribute service_info;
-  xml_attribute media_type;
-  anime_t *anime = NULL;
-  series_t *series = NULL;
-  film_t *film = NULL;
+  xml_attribute media_type_attr;
+  media_t *media_type_ptr = NULL;
 
   node = doc.first_child();
   for(; node; node = node.next_sibling()){
@@ -70,21 +74,21 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
       for(child_node = node.first_child(); child_node; child_node = child_node.next_sibling()){
         if(strcmp(child_node.name(), "medias") == 0){
           for(media = child_node.first_child(); media; media = media.next_sibling()){
-            for(media_type = media.first_attribute(); media_type; media_type = media_type.next_attribute()){ // Parcours de tous les medias
-              if(strcmp(media_type.value(), "anime") == 0){
-                anime = new anime_t;
-                xml_browse_media(media, service, *anime);
-                delete anime;
+            for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Parcours de tous les medias
+              if(strcmp(media_type_attr.value(), "anime") == 0){
+                media_type_ptr = new anime_t;
+                 err = xml_browse_media(media, service, *media_type_ptr);
+                delete media_type_ptr;
               }
-              if(strcmp(media_type.value(), "film") == 0){
-                film = new film_t;
-                xml_browse_media(media, service, *film);
-                delete film;
+              if(strcmp(media_type_attr.value(), "film") == 0){
+                media_type_ptr = new film_t;
+                err = xml_browse_media(media, service, *media_type_ptr);
+                delete media_type_ptr;
               }
-              if(strcmp(media_type.value(), "series") == 0){
-                series = new series_t;
-                xml_browse_media(media, service, *series);
-                delete series;
+              if(strcmp(media_type_attr.value(), "series") == 0){
+                media_type_ptr = new series_t;
+                err = xml_browse_media(media, service, *media_type_ptr);
+                delete media_type_ptr;
               }
             }
           }
@@ -95,7 +99,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
       }
     }
   }
-  return 0;
+  return err;
 }
 
 int main(int argc, char const *argv[]) {
@@ -116,7 +120,9 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  xml_browse(doc, streaming_service); // Ne pas oublier de verifier la valeur de retour de cette fonction pour traiter les exceptions ...
+  if(xml_browse(doc, streaming_service) != 0){
+    return 1;
+  }
 
   streaming_service.handle_m();
   return 0;
