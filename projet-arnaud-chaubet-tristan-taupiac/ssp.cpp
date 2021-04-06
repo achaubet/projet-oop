@@ -10,6 +10,7 @@
 #include <pugixml.hpp> // for xml_document, xml_node, xml_attributes, xml_parse_result
 #include <cstring> // for strcmp
 #include <cstdlib> // for strtof
+#include <cstdio> //  for fgets
 using namespace std;
 using namespace pugi;
 
@@ -18,11 +19,13 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   xml_node quality;
   xml_attribute media_name;
   char **endptr = NULL;
+
   for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
     if(strcmp(media_name.name(), "name") == 0){
       media_type.set_name(media_name.value());
     }
   }
+
   for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
     if(strcmp(media_info.name(), "qualities") == 0){
       for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
@@ -44,11 +47,12 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       media_type.set_year(strtol(media_info.child_value(), endptr, 10)); // try ... catch ICI
     }
   }
+
   try{
     service.medias_push_back(media_type);
   }
   catch(bad_alloc &e){
-    cerr << "An exception occured, cannot add media to streaming-service, reason: " << e.what() << endl;
+    cerr << "An exception occurred, cannot add media to streaming-service, reason: " << e.what() << endl;
     return -1;
   }
   return 0;
@@ -128,6 +132,26 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
   return 0;
 }
 
+void enter_commands(streaming_service_t streaming_service){
+  char input[30];
+  bool quit = false;
+  while(!quit){
+    cout << "SSP> ";
+    fgets(input, 30, stdin);
+
+    if(input[2]=='\0'){
+      switch(input[0]){
+        case 'i':streaming_service.handle_i();break;
+        case 'm':streaming_service.handle_m();break;
+        case 'n':streaming_service.handle_n();break;
+        case 'w':streaming_service.handle_w();break;
+        case 'q':quit=true;break;
+      }
+    }
+
+  }
+}
+
 int main(int argc, char const *argv[]) {
 
   xml_document doc;
@@ -150,6 +174,6 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  streaming_service.handle_m();
+  enter_commands(streaming_service);
   return 0;
 }
