@@ -132,6 +132,22 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
   return 0;
 }
 
+void print_help(){
+  cout << "h: prints this help" << endl;
+  cout << "i: prints information about the streaming service" << endl;
+  cout << "m: prints the streaming service medias" << endl;
+  cout << "mn NAME: prints the streaming service medias with the name containing NAME" << endl;
+  cout << "my YEAR: prints the streaming service medias with the year equal to YEAR" << endl;
+  cout << "myge YEAR: prints the streaming service with the year greater than or equal to YEAR" << endl;
+  cout << "mygt YEAR: prints the streaming service with the year greater than YEAR" << endl;
+  cout << "myle YEAR: prints the streaming service with the year less than or equal to YEAR" << endl;
+  cout << "mylt YEAR: prints the streaming service with the year less than YEAR" << endl;
+  cout << "n: prints the streaming service name" << endl;
+  cout << "q: quits SSP" << endl;
+  cout << "v: prints the SSP version" << endl;
+  cout << "w: prints the streaming service web address" << endl;
+}
+
 void enter_commands(streaming_service_t streaming_service){
   char input[30];
   bool quit = false;
@@ -145,7 +161,9 @@ void enter_commands(streaming_service_t streaming_service){
         case 'm':streaming_service.handle_m();break;
         case 'n':streaming_service.handle_n();break;
         case 'w':streaming_service.handle_w();break;
+        case 'h':print_help();break;
         case 'q':quit=true;break;
+        default:cout<<"./ssp.out: invalid command"<<endl;break;
       }
     }
 
