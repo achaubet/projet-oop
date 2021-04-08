@@ -148,27 +148,48 @@ void print_help(){
   cout << "w: prints the streaming service web address" << endl;
 }
 
+void read_stdin(char *input){
+  int i = 0;
+  bool is_here = false;
+  fgets(input, 30, stdin);
+  for(; i <= 20; i++){
+    if(input[i]=='\n'){
+      is_here = true;
+    }
+  }
+  if(!is_here){
+    while(getchar()!='\n');
+  }
+}
+
+
 void enter_commands(streaming_service_t streaming_service){
+  //int i = 0;
   char input[30];
+  /*char command[10];
+  char command_param[30];*/
   bool quit = false;
   while(!quit){
     cout << "SSP> ";
-    fgets(input, 30, stdin);
+    read_stdin(input);
 
-    if(input[2]=='\0'){
+    if(strlen(input)==2){
       switch(input[0]){
         case 'i':streaming_service.handle_i();break;
         case 'm':streaming_service.handle_m();break;
         case 'n':streaming_service.handle_n();break;
         case 'w':streaming_service.handle_w();break;
+        case 'v':cout << "SSP (Streaming Service Program) 20210408\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
         case 'h':print_help();break;
         case 'q':quit=true;break;
         default:cout<<"./ssp.out: invalid command"<<endl;break;
       }
     }
-
+    else{}
   }
 }
+
+
 
 int main(int argc, char const *argv[]) {
 
@@ -193,5 +214,6 @@ int main(int argc, char const *argv[]) {
   }
 
   enter_commands(streaming_service);
+
   return 0;
 }
