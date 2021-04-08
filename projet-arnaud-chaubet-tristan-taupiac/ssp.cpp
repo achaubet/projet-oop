@@ -152,27 +152,34 @@ void read_stdin(char *input){
   int i = 0;
   bool is_here = false;
   fgets(input, 30, stdin);
-  for(; i <= 20; i++){
-    if(input[i]=='\n'){
-      is_here = true;
-    }
+  if(input[0]=='\n'){
+    cout << "./ssp.out: invalid command" << endl;
+    input[0] = '\0';
   }
-  if(!is_here){
-    while(getchar()!='\n');
+  else{
+    if(input!=NULL){
+      for(; i <= static_cast<int>(strlen(input)); i++){
+        if(input[i]=='\n'){
+          is_here = true;
+        }
+      }
+      if(!is_here){
+        while(getchar()!='\n');
+      }
+    }
   }
 }
 
 
 void enter_commands(streaming_service_t streaming_service){
   //int i = 0;
-  char input[30];
+  char input[30] = {'\0'};
   /*char command[10];
   char command_param[30];*/
   bool quit = false;
   while(!quit){
     cout << "SSP> ";
     read_stdin(input);
-
     if(strlen(input)==2){
       switch(input[0]){
         case 'i':streaming_service.handle_i();break;
@@ -198,14 +205,14 @@ int main(int argc, char const *argv[]) {
   streaming_service_t streaming_service;
 
   if(argc != 2){
-    cerr << "./ssp.out: invalid number of arguments" << endl;
+    cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
 
   result = doc.load_file(argv[1]);
 
   if(!result){
-    cerr << "./ssp.out: unable to parse the document" << endl;
+    cerr << argv[0] << ": unable to parse the document" << endl;
     return 1;
   }
 
