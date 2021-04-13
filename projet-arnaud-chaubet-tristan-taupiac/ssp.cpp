@@ -132,7 +132,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
   return 0;
 }
 
-void print_help(){
+void handle_h(){
   cout << "h: prints this help" << endl;
   cout << "i: prints information about the streaming service" << endl;
   cout << "m: prints the streaming service medias" << endl;
@@ -148,34 +148,44 @@ void print_help(){
   cout << "w: prints the streaming service web address" << endl;
 }
 
-void read_stdin(char *input){
+void read_stdin(char *input){ //Fonction permettant la saisie et la verification de la saisie
   int i = 0;
   bool is_here = false;
-  fgets(input, 30, stdin);
-  if(input[0]=='\n'){
+  fgets(input, 30, stdin); //On rentre une commande
+  if(input[0]=='\n'){ // On verifie si celle-ci n'est pas vide
     cout << "./ssp.out: invalid command" << endl;
     input[0] = '\0';
   }
-  else{
-    if(input!=NULL){
-      for(; i <= static_cast<int>(strlen(input)); i++){
-        if(input[i]=='\n'){
-          is_here = true;
-        }
-      }
-      if(!is_here){
-        while(getchar()!='\n');
+  else{ // Sinon on verifie que la commande n'excède pas 30 caractères
+    for(; i <= static_cast<int>(strlen(input)); i++){
+      if(input[i]=='\n'){ // Si il trouve le caractère de contrôle '\n' alors la commande n'excède pas les 30 caractères
+        is_here = true; // Et on passe le booléen à vrai
       }
     }
+    if(!is_here){ // Si c'est faux alors il n'as pas trouvé de caractère de contrôle '\n', le flux n'est donc pas vide
+      while(getchar()!='\n'); // Il faut alors le vider avec la fonction getchar() jusqu'a atteindre le caractère de contrôle
+    }
+  }
+}
+
+void clear_char_array(char *array){
+  int size = strlen(array);
+  while(size > 0){
+    array[size] = '\0';
+    size--;
   }
 }
 
 
 void enter_commands(streaming_service_t streaming_service){
-  //int i = 0;
-  char input[30] = {'\0'};
-  /*char command[10];
-  char command_param[30];*/
+  int i = 0;
+  int j = 0;
+  int cmd_at = 0;
+  char **endPtr = NULL;
+  char input[30] = {'\0', '\0'};
+  char command[10] = {'\0'};
+  char command_param[30] = {'\0'};
+  const char* command_array[6] =  {"mn", "my", "myge", "mygt", "myle", "mylt"};
   bool quit = false;
   while(!quit){
     cout << "SSP> ";
@@ -187,36 +197,63 @@ void enter_commands(streaming_service_t streaming_service){
         case 'n':streaming_service.handle_n();break;
         case 'w':streaming_service.handle_w();break;
         case 'v':cout << "SSP (Streaming Service Program) 20210408\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
-        case 'h':print_help();break;
+        case 'h':handle_h();break;
         case 'q':quit=true;break;
         default:cout<<"./ssp.out: invalid command"<<endl;break;
       }
     }
-    else{}
+    else{
+      if((strlen(input)>2)){
+        i = 0;
+        cmd_at = -1;
+        if(strlen(command)!=0){clear_char_array(command);}
+        if(strlen(command_param)!=0){clear_char_array(command_param);}
+        while(input[i] != '\n' and input[i] != ' '){
+          command[i] = input[i];
+          i++;
+        }
+        for(j = 0; j < 6; j++){
+          if(strcmp(command, command_array[j])==0){cmd_at=j;}
+        }
+        cout << "cmd at: " << cmd_at << endl;
+        switch(cmd_at){
+          case 0:streaming_service.handle_mn(command_param);break;
+          case 1:streaming_service.handle_my(strtol(command_param, endPtr, 10));break;
+          case 2:streaming_service.handle_myge(strtol(command_param, endPtr, 10));break;
+          case 3:streaming_service.handle_mygt(strtol(command_param, endPtr, 10));break;
+          case 4:streaming_service.handle_myle(strtol(command_param, endPtr, 10));break;
+          case 5:streaming_service.handle_mylt(strtol(command_param, endPtr, 10));break;
+          default:cout<<"./ssp.out: invalid command"<<endl;break;
+        }
+      }
+      else{cout << "./ssp.out: invalid command" << endl;}
+    }
   }
 }
 
 
 
 int main(int argc, char const *argv[]) {
-
+  // Déclaration et initialisation des variables
   xml_document doc;
   xml_parse_result result;
   streaming_service_t streaming_service;
 
-  if(argc != 2){
+  // Début du programme et traitement des erreurs
+
+  if(argc != 2){ // On vérifie le nombres de paramètres passés en arguments
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
 
-  result = doc.load_file(argv[1]);
+  result = doc.load_file(argv[1]); // Récuperation du document passé en paramètres
 
-  if(!result){
+  if(!result){ // Si il y a une erreur avec le document ou si celui-ci n'existe pas
     cerr << argv[0] << ": unable to parse the document" << endl;
     return 1;
   }
 
-  if(xml_browse(doc, streaming_service) != 0){
+  if(xml_browse(doc, streaming_service) != 0){ // Si il y a une erreur durant le parcours du document XML
     return 1;
   }
 
