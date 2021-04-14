@@ -170,7 +170,7 @@ void read_stdin(char *input){ //Fonction permettant la saisie et la verification
 
 void clear_char_array(char *array){
   int size = strlen(array);
-  while(size > 0){
+  while(size >= 0){
     array[size] = '\0';
     size--;
   }
@@ -178,8 +178,7 @@ void clear_char_array(char *array){
 
 
 void enter_commands(streaming_service_t streaming_service){
-  int i = 0;
-  int j = 0;
+  int i = 0, j = 0, k = 0, l = 0;
   int cmd_at = 0;
   char **endPtr = NULL;
   char input[30] = {'\0', '\0'};
@@ -199,7 +198,7 @@ void enter_commands(streaming_service_t streaming_service){
         case 'v':cout << "SSP (Streaming Service Program) 20210408\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
         case 'h':handle_h();break;
         case 'q':quit=true;break;
-        default:cout<<"./ssp.out: invalid command"<<endl;break;
+        default:cerr<<"./ssp.out: invalid command"<<endl;break;
       }
     }
     else{
@@ -215,18 +214,46 @@ void enter_commands(streaming_service_t streaming_service){
         for(j = 0; j < 6; j++){
           if(strcmp(command, command_array[j])==0){cmd_at=j;}
         }
-        cout << "cmd at: " << cmd_at << endl;
-        switch(cmd_at){
-          case 0:streaming_service.handle_mn(command_param);break;
-          case 1:streaming_service.handle_my(strtol(command_param, endPtr, 10));break;
-          case 2:streaming_service.handle_myge(strtol(command_param, endPtr, 10));break;
-          case 3:streaming_service.handle_mygt(strtol(command_param, endPtr, 10));break;
-          case 4:streaming_service.handle_myle(strtol(command_param, endPtr, 10));break;
-          case 5:streaming_service.handle_mylt(strtol(command_param, endPtr, 10));break;
-          default:cout<<"./ssp.out: invalid command"<<endl;break;
+        if(cmd_at != -1){
+          l = 0;
+          k = strlen(command) + 1;
+          if(static_cast<int>(strlen(input)) > k){
+            while((input[k] != '\n')){
+              command_param[l] = input[k];
+              k++;
+              l++;
+            }
+          }
+          if((command_param[0] == '\0') or (command_param[0] == '\n')){
+            cerr << "./ssp.out: Missing parameter for the " << command << " command" << endl;
+          }
+          else{
+            if(strlen(command_param) >= 18){
+              cerr << "./ssp.out: too many characters for the command" << endl;
+            }
+            if((strtol(command_param, NULL, 10) == 0) and (strcmp(command, "mn") != 0)){
+              cerr << "./ssp.out: invalid parameter for the " << command <<  " command" << endl;
+            }
+            else{
+              if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){
+                cerr << "./ssp.out: invalid parameter for the " << command <<  " command" << endl;
+              }
+              else{
+                switch(cmd_at){
+                  case 0:streaming_service.handle_mn(command_param);break;
+                  case 1:streaming_service.handle_my(strtol(command_param, endPtr, 10));break;
+                  case 2:streaming_service.handle_myge(strtol(command_param, endPtr, 10));break;
+                  case 3:streaming_service.handle_mygt(strtol(command_param, endPtr, 10));break;
+                  case 4:streaming_service.handle_myle(strtol(command_param, endPtr, 10));break;
+                  case 5:streaming_service.handle_mylt(strtol(command_param, endPtr, 10));break;
+                }
+              }
+            }
+          }
         }
+        else{cerr << "./ssp.out: invalid command" << endl;}
       }
-      else{cout << "./ssp.out: invalid command" << endl;}
+      else{cerr << "./ssp.out: invalid command" << endl;}
     }
   }
 }
