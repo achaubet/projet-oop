@@ -153,7 +153,7 @@ void read_stdin(char *input){ //Fonction permettant la saisie et la verification
   bool is_here = false;
   fgets(input, 30, stdin); //On rentre une commande
   if(input[0]=='\n'){ // On verifie si celle-ci n'est pas vide
-    cout << "./ssp.out: invalid command" << endl;
+    cerr << "./ssp.out: invalid command" << endl;
     input[0] = '\0';
   }
   else{ // Sinon on verifie que la commande n'excède pas 30 caractères
@@ -177,7 +177,7 @@ void clear_char_array(char *array){
 }
 
 
-void enter_commands(streaming_service_t streaming_service){
+void enter_commands(streaming_service_t streaming_service, const char *argv){
   int i = 0, j = 0, k = 0, l = 0;
   int cmd_at = 0;
   char **endPtr = NULL;
@@ -198,7 +198,7 @@ void enter_commands(streaming_service_t streaming_service){
         case 'v':cout << "SSP (Streaming Service Program) 20210408\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
         case 'h':handle_h();break;
         case 'q':quit=true;break;
-        default:cerr<<"./ssp.out: invalid command"<<endl;break;
+        default:cerr << argv << ": invalid command" << endl;break;
       }
     }
     else{
@@ -217,7 +217,7 @@ void enter_commands(streaming_service_t streaming_service){
         if(cmd_at != -1){
           l = 0;
           k = strlen(command) + 1;
-          if(static_cast<int>(strlen(input)) > k){
+          if((static_cast<int>(strlen(input)) > k) and (strlen(input) < 25)){
             while((input[k] != '\n')){
               command_param[l] = input[k];
               k++;
@@ -225,18 +225,18 @@ void enter_commands(streaming_service_t streaming_service){
             }
           }
           if((command_param[0] == '\0') or (command_param[0] == '\n')){
-            cerr << "./ssp.out: Missing parameter for the " << command << " command" << endl;
+            cerr << argv << ": Missing parameter for the " << command << " command" << endl;
           }
           else{
             if(strlen(command_param) >= 18){
-              cerr << "./ssp.out: too many characters for the command" << endl;
+              cerr << argv << ": too many characters for the command" << endl;
             }
             if((strtol(command_param, NULL, 10) == 0) and (strcmp(command, "mn") != 0)){
-              cerr << "./ssp.out: invalid parameter for the " << command <<  " command" << endl;
+              cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
             }
             else{
               if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){
-                cerr << "./ssp.out: invalid parameter for the " << command <<  " command" << endl;
+                cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
               }
               else{
                 switch(cmd_at){
@@ -251,9 +251,9 @@ void enter_commands(streaming_service_t streaming_service){
             }
           }
         }
-        else{cerr << "./ssp.out: invalid command" << endl;}
+        else{cerr << argv << ": invalid command" << endl;}
       }
-      else{cerr << "./ssp.out: invalid command" << endl;}
+      else{cerr << argv << ": invalid command" << endl;}
     }
   }
 }
@@ -284,7 +284,7 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  enter_commands(streaming_service);
+  enter_commands(streaming_service, argv[0]);
 
   return 0;
 }
