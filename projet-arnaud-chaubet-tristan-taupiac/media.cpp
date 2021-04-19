@@ -1,3 +1,6 @@
+/**
+ * \file media.cpp
+ */
 #include "media.h" // for media_t
 #include <iostream> // for cout
 #include <cstring> // for strcmp
@@ -30,7 +33,7 @@ void media_t::handle_m() const{
 }
 
 void media_t::handle_mn(string name) const{
-  const char * strstr_cmp = strstr(this->get_name().c_str(), name.c_str());
+  const char *strstr_cmp = strstr(this->get_name().c_str(), name.c_str());
   if(strstr_cmp != NULL){
     this->handle_m();
   }

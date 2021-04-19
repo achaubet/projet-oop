@@ -1,3 +1,6 @@
+/**
+ * \file ssp.cpp
+ */
 #include "streaming-service.h" // for streaming_service_t
 #include "media.h" // for media_t
 #include "anime.h" // for anime_t
@@ -10,15 +13,16 @@
 #include <pugixml.hpp> // for xml_document, xml_node, xml_attributes, xml_parse_result
 #include <cstring> // for strcmp
 #include <cstdlib> // for strtof
-#include <cstdio> //  for fgets
-using namespace std;
-using namespace pugi;
+#include <cstdio> // for fgets
+using namespace std; // for cour
+using namespace pugi; // for xml_node, xml_attribute
 
-int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type){
+int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
   xml_node media_info;
   xml_node quality;
   xml_attribute media_name;
-  char **endptr = NULL;
+  float rating = 0.0;
+  char *endptr = NULL;
 
   for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
     if(strcmp(media_name.name(), "name") == 0){
@@ -41,10 +45,18 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       }
     }
     if(strcmp(media_info.name(), "rating") == 0){
-      media_type.set_rating(strtof(media_info.child_value(),endptr));  // Try ... Catch ICI (Si echec, retouner -1)
+      try{
+        rating = strtof(media_info.child_value(), &endptr);
+        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());}
+      }
+      catch(str2f_error &e){
+        cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
+        return -1;
+      }
+      media_type.set_rating(rating);
     }
     if(strcmp(media_info.name(), "year") == 0){
-      media_type.set_year(strtol(media_info.child_value(), endptr, 10)); // try ... catch ICI
+      media_type.set_year(strtol(media_info.child_value(), &endptr, 10)); // try ... catch ICI
     }
   }
 
@@ -52,13 +64,13 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
     service.medias_push_back(media_type);
   }
   catch(bad_alloc &e){
-    cerr << "An exception occurred, cannot add media to streaming-service, reason: " << e.what() << endl;
+    cerr << argv << ": an exception occurred (cannot add media to streaming-service, reason: " << e.what() << ")" << endl;
     return -1;
   }
   return 0;
 }
 
-int xml_browse(xml_document &doc, streaming_service_t &service){
+int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv){
   xml_node node;
   xml_node child_node;
   xml_node media;
@@ -83,10 +95,10 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
                   media_type_ptr = new anime_t;
                 }
                 catch(bad_alloc &e){
-                  cerr << "An exception occurred, cannot allocate a new anime, reason: " << e.what() << endl;
+                  cerr << argv << ": an exception occurred (cannot allocate a new anime, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
-                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                if(xml_browse_media(media, service, *media_type_ptr, argv) != 0){
                   delete media_type_ptr;
                   return -1;
                 }
@@ -97,10 +109,10 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
                   media_type_ptr = new film_t;
                 }
                 catch(bad_alloc &e){
-                  cerr << "An exception occurred, cannot allocate a new film, reason: " << e.what() << endl;
+                  cerr << argv << ": an exception occurred (cannot allocate a new film, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
-                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                if(xml_browse_media(media, service, *media_type_ptr, argv) != 0){
                   delete media_type_ptr;
                   return -1;
                 }
@@ -111,10 +123,10 @@ int xml_browse(xml_document &doc, streaming_service_t &service){
                   media_type_ptr = new series_t;
                 }
                 catch(bad_alloc &e){
-                  cerr << "An exception occurred, cannot allocate a new series, reason: " << e.what() << endl;
+                  cerr << argv <<": an exception occurred (cannot allocate a new series, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
-                if(xml_browse_media(media, service, *media_type_ptr) != 0){
+                if(xml_browse_media(media, service, *media_type_ptr, argv) != 0){
                   delete media_type_ptr;
                   return -1;
                 }
@@ -148,12 +160,12 @@ void handle_h(){
   cout << "w: prints the streaming service web address" << endl;
 }
 
-void read_stdin(char *input){ //Fonction permettant la saisie et la verification de la saisie
+void read_stdin(char *input, const char *argv){ //Fonction permettant la saisie et la verification de la saisie
   int i = 0;
   bool is_here = false;
   fgets(input, 30, stdin); //On rentre une commande
   if(input[0]=='\n'){ // On verifie si celle-ci n'est pas vide
-    cerr << "./ssp.out: invalid command" << endl;
+    cerr << argv << ": invalid command" << endl;
     input[0] = '\0';
   }
   else{ // Sinon on verifie que la commande n'excède pas 30 caractères
@@ -188,7 +200,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
   bool quit = false;
   while(!quit){
     cout << "SSP> ";
-    read_stdin(input);
+    read_stdin(input, argv);
     if(strlen(input)==2){
       switch(input[0]){
         case 'i':streaming_service.handle_i();break;
@@ -261,26 +273,26 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
 
 
 int main(int argc, char const *argv[]) {
-  // Déclaration et initialisation des variables
+  // Declaration and initialization
   xml_document doc;
   xml_parse_result result;
   streaming_service_t streaming_service;
 
-  // Début du programme et traitement des erreurs
+  // Error Handling
 
-  if(argc != 2){ // On vérifie le nombres de paramètres passés en arguments
+  if(argc != 2){ // Check if the numbers of arguments are correct
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
 
-  result = doc.load_file(argv[1]); // Récuperation du document passé en paramètres
+  result = doc.load_file(argv[1]); // Reading the document passed in parameters
 
-  if(!result){ // Si il y a une erreur avec le document ou si celui-ci n'existe pas
+  if(!result){ // If there is an error or if the document doesn't exist
     cerr << argv[0] << ": unable to parse the document" << endl;
     return 1;
   }
 
-  if(xml_browse(doc, streaming_service) != 0){ // Si il y a une erreur durant le parcours du document XML
+  if(xml_browse(doc, streaming_service, argv[0]) != 0){ // If there is an error while browsing the XML document
     return 1;
   }
 

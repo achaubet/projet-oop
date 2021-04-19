@@ -6,7 +6,7 @@
 #include <string> // for string
 #include <vector> // for vector
 #include "media.h" // for media_t
-using namespace std; //for string
+using namespace std; // for string
 /**
  * A streaming service.
  */
@@ -125,4 +125,3 @@ class streaming_service_t
  */
 ostream &operator<<(ostream &os, const streaming_service_t &streaming_service);
 #endif
-

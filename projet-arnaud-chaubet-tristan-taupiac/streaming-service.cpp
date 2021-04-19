@@ -1,3 +1,6 @@
+/**
+ * \file streaming-service.cpp
+ */
 #include "streaming-service.h" // for streaming_service_h
 #include <iostream> // for cout
 
