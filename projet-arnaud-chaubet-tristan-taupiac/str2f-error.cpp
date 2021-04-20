@@ -1,9 +1,8 @@
 /**
  * \file str2f-error.cpp
  */
-#include "str2f-error.h"
-#include <string>
-#include <sstream>
+#include "str2f-error.h" // for str2f_error
+#include <sstream> // for ostringstream
 
 str2f_error::str2f_error(string str){
   ostringstream oss;
@@ -14,5 +13,5 @@ str2f_error::str2f_error(string str){
 str2f_error::~str2f_error() throw (){}
 
 const char *str2f_error::what() const throw(){
-  return str.c_str();
+  return this->str.c_str();
 }

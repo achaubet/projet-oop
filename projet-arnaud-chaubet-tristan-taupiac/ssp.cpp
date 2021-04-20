@@ -14,8 +14,10 @@
 #include <cstring> // for strcmp
 #include <cstdlib> // for strtof
 #include <cstdio> // for fgets
-using namespace std; // for cour
+using namespace std; // for cout
 using namespace pugi; // for xml_node, xml_attribute
+
+
 
 int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
   xml_node media_info;
@@ -29,7 +31,6 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       media_type.set_name(media_name.value());
     }
   }
-
   for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
     if(strcmp(media_info.name(), "qualities") == 0){
       for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
@@ -59,7 +60,6 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
       media_type.set_year(strtol(media_info.child_value(), &endptr, 10)); // try ... catch ICI
     }
   }
-
   try{
     service.medias_push_back(media_type);
   }
@@ -69,6 +69,9 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   }
   return 0;
 }
+
+
+
 
 int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv){
   xml_node node;
@@ -144,6 +147,9 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
   return 0;
 }
 
+
+
+
 void handle_h(){
   cout << "h: prints this help" << endl;
   cout << "i: prints information about the streaming service" << endl;
@@ -160,33 +166,40 @@ void handle_h(){
   cout << "w: prints the streaming service web address" << endl;
 }
 
-void read_stdin(char *input, const char *argv){ //Fonction permettant la saisie et la verification de la saisie
+
+
+void read_stdin(char *input, const char *argv){ // Function allowing the entry of a command and the verification of the entry
   int i = 0;
   bool is_here = false;
-  fgets(input, 30, stdin); //On rentre une commande
-  if(input[0]=='\n'){ // On verifie si celle-ci n'est pas vide
+  
+  fgets(input, 30, stdin); // Allows the read of the stdin stream
+  if(input[0]=='\n'){ // Check if the command is not empty
     cerr << argv << ": invalid command" << endl;
     input[0] = '\0';
   }
-  else{ // Sinon on verifie que la commande n'excède pas 30 caractères
+  else{ // Else, we check that the command is not greater than 30 characters
     for(; i <= static_cast<int>(strlen(input)); i++){
-      if(input[i]=='\n'){ // Si il trouve le caractère de contrôle '\n' alors la commande n'excède pas les 30 caractères
-        is_here = true; // Et on passe le booléen à vrai
+      if(input[i]=='\n'){ // If it finds the control character '\n' then the command doesn't exceed 30 character
+        is_here = true; // And we set the boolean to true
       }
     }
-    if(!is_here){ // Si c'est faux alors il n'as pas trouvé de caractère de contrôle '\n', le flux n'est donc pas vide
-      while(getchar()!='\n'); // Il faut alors le vider avec la fonction getchar() jusqu'a atteindre le caractère de contrôle
+    if(!is_here){ // If it's false then it did not find the control character '\n', so the stdin stream is not empty
+      while(getchar()!='\n'); // It must be cleared with the getchar() function until reaching the control character
     }
   }
 }
 
-void clear_char_array(char *array){
+
+
+void clear_char_array(char *array){ // Function allowing to clear an array of characters
   int size = strlen(array);
+
   while(size >= 0){
     array[size] = '\0';
     size--;
   }
 }
+
 
 
 void enter_commands(streaming_service_t streaming_service, const char *argv){
@@ -198,6 +211,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
   char command_param[30] = {'\0'};
   const char* command_array[6] =  {"mn", "my", "myge", "mygt", "myle", "mylt"};
   bool quit = false;
+
   while(!quit){
     cout << "SSP> ";
     read_stdin(input, argv);
@@ -207,7 +221,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
         case 'm':streaming_service.handle_m();break;
         case 'n':streaming_service.handle_n();break;
         case 'w':streaming_service.handle_w();break;
-        case 'v':cout << "SSP (Streaming Service Program) 20210408\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
+        case 'v':cout << "SSP (Streaming Service Program) 20210420\n\n" << "Copyright (C) 2021 Tristan Taupiac and Arnaud Chaubet.\n\n" << "Written by Tristan Taupiac <tristan.taupiac@etud.univ-pau.fr> and Arnaud Chaubet <a.chaubet@etud.univ-pau.fr>." <<endl;break;
         case 'h':handle_h();break;
         case 'q':quit=true;break;
         default:cerr << argv << ": invalid command" << endl;break;
@@ -269,6 +283,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
     }
   }
 }
+
 
 
 
