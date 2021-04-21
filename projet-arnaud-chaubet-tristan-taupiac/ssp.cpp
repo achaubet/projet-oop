@@ -171,7 +171,7 @@ void handle_h(){
 void read_stdin(char *input, const char *argv){ // Function allowing the entry of a command and the verification of the entry
   int i = 0;
   bool is_here = false;
-  
+
   fgets(input, 30, stdin); // Allows the read of the stdin stream
   if(input[0]=='\n'){ // Check if the command is not empty
     cerr << argv << ": invalid command" << endl;
@@ -192,7 +192,7 @@ void read_stdin(char *input, const char *argv){ // Function allowing the entry o
 
 
 void clear_char_array(char *array){ // Function allowing to clear an array of characters
-  int size = strlen(array);
+  int size = strlen(array); // Sets size to the size of the array
 
   while(size >= 0){
     array[size] = '\0';

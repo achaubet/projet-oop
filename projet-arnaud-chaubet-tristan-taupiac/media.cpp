@@ -5,55 +5,55 @@
 #include <iostream> // for cout
 #include <cstring> // for strcmp
 
-media_t::media_t(){
-  this->announcement = "undefined";
-  this->name = "undefined";
-  this->rating = -1;
-  this->year = -1;
+media_t::media_t(){ // Constructs a new media
+  this->announcement = "undefined"; // Initializes its announcement to undefined
+  this->name = "undefined"; // Initializes its name to undefined
+  this->rating = -1; // Initializes its rating to -1
+  this->year = -1; // Initializes its year to -1
 }
 
-string media_t::get_announcement() const{
-  return this->announcement;
+string media_t::get_announcement() const{ // Gets the announcement for this media
+  return this->announcement; // Return the announcement for this media
 }
 
-string media_t::get_name() const{
-  return this->name;
+string media_t::get_name() const{ // Gets the name for this media
+  return this->name; // Return the name for this media
 }
 
-float media_t::get_rating() const{
-  return this->rating;
+float media_t::get_rating() const{ // Gets the rating for this media
+  return this->rating; // Return the rating for this media
 }
 
-int media_t::get_year() const{
-  return this->year;
+int media_t::get_year() const{ // Gets the year for this media
+  return this->year; // Return the year for this media
 }
 
-void media_t::handle_m() const{
+void media_t::handle_m() const{ // Handles the m command for this media
   cout << *this << endl;
 }
 
-void media_t::handle_mn(string name) const{
+void media_t::handle_mn(string name) const{ // Handles the mn command for this media
   const char *strstr_cmp = strstr(this->get_name().c_str(), name.c_str());
-  if(strstr_cmp != NULL){
+  if(strstr_cmp != NULL){ // If strstr_cmp is not NULL, then the name of this media contains NAME
     this->handle_m();
   }
 }
 
-void media_t::handle_my(int year) const{
-  if(this->get_year() == year){
-    this->handle_m();
+void media_t::handle_my(int year) const{ // Handles the my command for this media
+  if(this->get_year() == year){ // If year is equal to this media year
+    this->handle_m(); // Then calls the handle_m method
   }
 }
 
-void media_t::handle_myge(int year) const{
-  if(this->get_year() >= year){
-    this->handle_m();
+void media_t::handle_myge(int year) const{ // Handles the myge command for this media
+  if(this->get_year() >= year){ // If year is greater or equal than this media year
+    this->handle_m(); // Then calls the handle_m method
   }
 }
 
-void media_t::handle_mygt(int year) const{
-  if(this->get_year() > year){
-    this->handle_m();
+void media_t::handle_mygt(int year) const{ // Handles the mygt command for this media
+  if(this->get_year() > year){ // If year is greater than this media
+    this->handle_m(); // Then calls the handle_m method
   }
 }
 
@@ -95,9 +95,9 @@ void media_t::set_year(int year){
 
 ostream &operator<<(ostream &os, const media_t &media){
   int i = 0;
-  os << "("<< media.get_name() << ", " << media.get_year() << ", " << media.get_announcement() << ", " << media.get_rating() << ", (";
-  for(i = media.qualities_at(0); i < (media.qualities_size()+media.qualities_at(0)); i++){
-    switch(i){
+  os << "("<< media.get_name() << ", " << media.get_year() << ", " << media.get_announcement() << ", " << media.get_rating() << ", ("; // Inserts the name, the year, the announcement and the rating of this media
+  for(i = media.qualities_at(0); i < (media.qualities_size()+media.qualities_at(0)); i++){ // Browses the qualities of this media
+    switch(i){ // And add them to the output stream
       case low:os << "low";break;
       case medium:os << "medium";break;
       case high:os << "high";break;
@@ -105,5 +105,5 @@ ostream &operator<<(ostream &os, const media_t &media){
     i != (((media.qualities_at(0)+media.qualities_size())-1)) ? os << ", " : os << ")";
   }
   os << ")";
-  return os;
+  return os; // Return the output stream
 }
