@@ -9,7 +9,7 @@ using namespace std;
  * Constructs a new string to int conversion exception.
  * \param str The string that cannot be converted to a int.
  */
-str2f_error::str2f_error(string str){
+str2i_error::str2i_error(string str){
   ostringstream oss;
   oss << "str2i_error: unable to convert the string \"" << str << "\" to a int";
   this->str = oss.str();
