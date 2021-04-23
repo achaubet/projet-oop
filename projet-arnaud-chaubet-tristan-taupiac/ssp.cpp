@@ -10,15 +10,15 @@
 #include "str2i-error.h" // for str2i-error
 #include "str2l-error.h" // for str2l-error
 #include <iostream> // for cout
-#include <pugixml.hpp> // for xml_document, xml_node, xml_attributes, xml_parse_result
+#include <pugixml.hpp> // for xml_document, xml_node, xml_attributes and xml_parse_result
 #include <cstring> // for strcmp
 #include <cstdlib> // for strtof
 #include <cstdio> // for fgets
 using namespace std; // for cout
-using namespace pugi; // for xml_node, xml_attribute
-
-
-
+using namespace pugi; // for xml_node, xml_attribute and xml_parse_result
+/**
+ * Browses an XML file containing data about a media of a streaming service.
+ */
 int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
   xml_node media_info;
   xml_node quality;
@@ -69,10 +69,9 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   }
   return 0;
 }
-
-
-
-
+/**
+ * Browses an XML file containing data about a streaming service and the media it broadcasts.
+ */
 int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv){
   xml_node node;
   xml_node child_node;
@@ -146,10 +145,9 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
   }
   return 0;
 }
-
-
-
-
+/**
+ * Handles the h command.
+ */
 void handle_h(){
   cout << "h: prints this help" << endl;
   cout << "i: prints information about the streaming service" << endl;
@@ -165,10 +163,10 @@ void handle_h(){
   cout << "v: prints the SSP version" << endl;
   cout << "w: prints the streaming service web address" << endl;
 }
-
-
-
-void read_stdin(char *input, const char *argv){ // Function allowing the entry of a command and the verification of the entry
+/**
+ * Function allowing the entry of a command and the verification of the entry
+ */
+void read_stdin(char *input, const char *argv){
   int i = 0;
   bool is_here = false;
 
@@ -188,10 +186,10 @@ void read_stdin(char *input, const char *argv){ // Function allowing the entry o
     }
   }
 }
-
-
-
-void clear_char_array(char *array){ // Function allowing to clear an array of characters
+/**
+ * Clear an array of characters.
+ */
+void clear_char_array(char *array){
   int size = strlen(array); // Sets size to the size of the array
 
   while(size >= 0){
@@ -199,9 +197,9 @@ void clear_char_array(char *array){ // Function allowing to clear an array of ch
     size--;
   }
 }
-
-
-
+/**
+ * Function allowing the entry of a command and the verification of the entry.
+ */
 void enter_commands(streaming_service_t streaming_service, const char *argv){
   int i = 0, j = 0, k = 0, l = 0;
   int cmd_at = 0;
@@ -214,7 +212,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
 
   while(!quit){
     cout << "SSP> ";
-    read_stdin(input, argv);
+    read_stdin(input, argv); // Retrieves the command entered by the user.
     if(strlen(input)==2){
       switch(input[0]){
         case 'i':streaming_service.handle_i();break;
@@ -285,32 +283,40 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
 }
 
 
-
-
 int main(int argc, char const *argv[]) {
-  // Declaration and initialization
+  /**
+   * Declaration and initialization.
+   */
   xml_document doc;
   xml_parse_result result;
   streaming_service_t streaming_service;
-
-  // Error Handling
-
-  if(argc != 2){ // Check if the numbers of arguments are correct
+  /**
+   * Error handling.
+   */
+  if(argc != 2){ /**< Check if the numbers of arguments are correct.*/
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
-
-  result = doc.load_file(argv[1]); // Reading the document passed in parameters
-
-  if(!result){ // If there is an error or if the document doesn't exist
+  /**
+   * Read the document passed in parameters.
+   */
+  result = doc.load_file(argv[1]);
+  /**
+   * If there is an error or if the document doesn't exist.
+   */
+  if(!result){
     cerr << argv[0] << ": unable to parse the document" << endl;
     return 1;
   }
-
-  if(xml_browse(doc, streaming_service, argv[0]) != 0){ // If there is an error while browsing the XML document
+  /**
+   * Browses the XML document, if there is an error, the program ends and returns 1.
+   */
+  if(xml_browse(doc, streaming_service, argv[0]) != 0){
     return 1;
   }
-
+  /**
+   * Allows to enter commands.
+   */
   enter_commands(streaming_service, argv[0]);
 
   return 0;
