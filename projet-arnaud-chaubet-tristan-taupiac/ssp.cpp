@@ -18,6 +18,11 @@ using namespace std; // for cout
 using namespace pugi; // for xml_node, xml_attribute and xml_parse_result
 /**
  * Browses an XML file containing data about a media of a streaming service.
+ * \param media A media XML node.
+ * \param service A streaming service.
+ * \param media_type A media.
+ * \param argv The name of this program.
+ * \return -1 on error, else 0.
  */
 int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
   xml_node media_info;
@@ -26,26 +31,26 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   float rating = 0.0;
   char *endptr = NULL;
 
-  for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
-    if(strcmp(media_name.name(), "name") == 0){
-      media_type.set_name(media_name.value());
+  for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){ // Browses the attributes for a media.
+    if(strcmp(media_name.name(), "name") == 0){ // If the node name is "name".
+      media_type.set_name(media_name.value()); // Sets the media name to media_name.value()
     }
   }
-  for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
-    if(strcmp(media_info.name(), "qualities") == 0){
-      for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
-        if(strcmp(quality.child_value(), "low") == 0){
-          media_type.qualities_push_back(low);
+  for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){ // Browses the qualities for a media.
+    if(strcmp(media_info.name(), "qualities") == 0){ // If the node name is "qualities"
+      for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){  // Browses the quality of a media.
+        if(strcmp(quality.child_value(), "low") == 0){ // If the quality is low.
+          media_type.qualities_push_back(low); // Add "low" quality for this media.
         }
-        if(strcmp(quality.child_value(), "medium") == 0){
-          media_type.qualities_push_back(medium);
+        if(strcmp(quality.child_value(), "medium") == 0){ // If the quality is medium.
+          media_type.qualities_push_back(medium); // Add "medium" quality for this media.
         }
-        if(strcmp(quality.child_value(), "high") == 0){
-          media_type.qualities_push_back(high);
+        if(strcmp(quality.child_value(), "high") == 0){ // If the quality is high.
+          media_type.qualities_push_back(high); // Add "high" quality for this media.
         }
       }
     }
-    if(strcmp(media_info.name(), "rating") == 0){
+    if(strcmp(media_info.name(), "rating") == 0){ // if the node name is "rating".
       try{
         rating = strtof(media_info.child_value(), &endptr);
         if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());}
@@ -71,6 +76,10 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
 }
 /**
  * Browses an XML file containing data about a streaming service and the media it broadcasts.
+ * \param doc The XML Document.
+ * \param service A streaming service.
+ * \param argv The name of this program.
+ * \return -1 on error, else 0.
  */
 int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv){
   xml_node node;
@@ -80,7 +89,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
   xml_attribute media_type_attr;
   media_t *media_type_ptr = NULL;
 
-  node = doc.first_child();
+  node = doc.first_child(); // Sets node to the first child of the XML document.
   for(; node; node = node.next_sibling()){
     if(strcmp(node.name(), "streaming-service") == 0){
       for(service_info = node.first_attribute(); service_info; service_info = service_info.next_attribute()){
@@ -91,10 +100,10 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
       for(child_node = node.first_child(); child_node; child_node = child_node.next_sibling()){
         if(strcmp(child_node.name(), "medias") == 0){
           for(media = child_node.first_child(); media; media = media.next_sibling()){
-            for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Parcours de tous les medias
-              if(strcmp(media_type_attr.value(), "anime") == 0){
+            for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Browses of all medias.
+              if(strcmp(media_type_attr.value(), "anime") == 0){ // If the media is an anime.
                 try{
-                  media_type_ptr = new anime_t;
+                  media_type_ptr = new anime_t; // Try to create an anime.
                 }
                 catch(bad_alloc &e){
                   cerr << argv << ": an exception occurred (cannot allocate a new anime, reason: " << e.what() << ")" << endl;
@@ -108,7 +117,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
               }
               if(strcmp(media_type_attr.value(), "film") == 0){
                 try{
-                  media_type_ptr = new film_t;
+                  media_type_ptr = new film_t; // Try to create a film.
                 }
                 catch(bad_alloc &e){
                   cerr << argv << ": an exception occurred (cannot allocate a new film, reason: " << e.what() << ")" << endl;
@@ -122,7 +131,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
               }
               if(strcmp(media_type_attr.value(), "series") == 0){
                 try{
-                  media_type_ptr = new series_t;
+                  media_type_ptr = new series_t; // Try to create a series.
                 }
                 catch(bad_alloc &e){
                   cerr << argv <<": an exception occurred (cannot allocate a new series, reason: " << e.what() << ")" << endl;
@@ -137,8 +146,8 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
             }
           }
         }
-        if(strcmp(child_node.name(), "web") == 0){
-          service.set_web(child_node.child_value());
+        if(strcmp(child_node.name(), "web") == 0){ // If the node name is "Web".
+          service.set_web(child_node.child_value()); // Sets the streaming service website. 
         }
       }
     }
@@ -165,6 +174,8 @@ void handle_h(){
 }
 /**
  * Function allowing the entry of a command and the verification of the entry
+ * \param input The input.
+ * \param argv The name of this program.
  */
 void read_stdin(char *input, const char *argv){
   int i = 0;
@@ -188,6 +199,7 @@ void read_stdin(char *input, const char *argv){
 }
 /**
  * Clear an array of characters.
+ * \param array An array of characters.
  */
 void clear_char_array(char *array){
   int size = strlen(array); // Sets size to the size of the array
@@ -198,6 +210,8 @@ void clear_char_array(char *array){
 }
 /**
  * Processes the input command.
+ * \param streaming_service A streaming service.
+ * \param argv The name of this program.
  */
 void enter_commands(streaming_service_t streaming_service, const char *argv){
   int i = 0, j = 0, k = 0, l = 0;
@@ -280,42 +294,39 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
     }
   }
 }
-
-
+/**
+ * The main function.
+ * \param argc The numbers of arguments.
+ * \param argv The array containing the arguments.
+ * \return 1 on error, else 0.
+ */
 int main(int argc, char const *argv[]) {
-  /**
-   * Declaration and initialization.
-   */
+  // Declaration and initialization.
   xml_document doc;
   xml_parse_result result;
   streaming_service_t streaming_service;
-  /**
-   * Error handling.
-   */
+
+  //Error handling.
   if(argc != 2){ // Check if the numbers of arguments are correct.
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
-  /**
-   * Read the document passed in parameters.
-   */
+
+  // Read the document passed in parameters.
   result = doc.load_file(argv[1]);
-  /**
-   * If there is an error or if the document doesn't exist.
-   */
+
+  // If there is an error or if the document doesn't exist.
   if(!result){
     cerr << argv[0] << ": unable to parse the document" << endl;
     return 1;
   }
-  /**
-   * Browses the XML document, if there is an error, the program ends and returns 1.
-   */
+
+  // Browses the XML document, if there is an error, the program ends and returns 1.
   if(xml_browse(doc, streaming_service, argv[0]) != 0){
     return 1;
   }
-  /**
-   * Allows to enter commands.
-   */
+
+  // Allows to enter commands.
   enter_commands(streaming_service, argv[0]);
 
   return 0;
