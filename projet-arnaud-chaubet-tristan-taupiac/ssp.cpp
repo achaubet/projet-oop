@@ -191,14 +191,13 @@ void read_stdin(char *input, const char *argv){
  */
 void clear_char_array(char *array){
   int size = strlen(array); // Sets size to the size of the array
-
   while(size >= 0){
-    array[size] = '\0';
+    array[size] = '\0'; // Sets value to '\0'.
     size--;
   }
 }
 /**
- * Function allowing the entry of a command and the verification of the entry.
+ * Processes the input command.
  */
 void enter_commands(streaming_service_t streaming_service, const char *argv){
   int i = 0, j = 0, k = 0, l = 0;
@@ -293,7 +292,7 @@ int main(int argc, char const *argv[]) {
   /**
    * Error handling.
    */
-  if(argc != 2){ /**< Check if the numbers of arguments are correct.*/
+  if(argc != 2){ // Check if the numbers of arguments are correct.
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
