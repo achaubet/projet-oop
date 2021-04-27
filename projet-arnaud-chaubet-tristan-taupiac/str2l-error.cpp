@@ -3,9 +3,6 @@
  */
 #include "str2l-error.h" // for str2l-error.h
 #include <sstream> // for ostringstream
-#include <exception> // for exception
-#include <string> // for string
-using namespace std;
 /**
  * Constructs a new string to long conversion exception.
  * \param str The string that cannot be converted to a long.
