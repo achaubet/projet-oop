@@ -27,56 +27,77 @@ using namespace pugi; // for xml_node, xml_attribute and xml_parse_result
  * \param argv The name of this program.
  * \return -1 on error, else 0.
  */
-int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
-  xml_node media_info;
-  xml_node quality;
-  xml_attribute media_name;
-  float rating = 0.0;
-  char *endptr = NULL;
+ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &media_type, const char *argv){
+   xml_node media_info;
+   xml_node quality;
+   xml_attribute media_name;
+   float rating = 0.0;
+   long l_year = 0;
+   int year = 0;
+   char *endptr = NULL;
 
-  for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){ // Browses the attributes for a media.
-    if(strcmp(media_name.name(), "name") == 0){ // If the node name is "name".
-      media_type.set_name(media_name.value()); // Sets the media name to media_name.value()
-    }
-  }
-  for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){ // Browses the qualities for a media.
-    if(strcmp(media_info.name(), "qualities") == 0){ // If the node name is "qualities"
-      for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){  // Browses the quality of a media.
-        if(strcmp(quality.child_value(), "low") == 0){ // If the quality is low.
-          media_type.qualities_push_back(low); // Add "low" quality for this media.
-        }
-        if(strcmp(quality.child_value(), "medium") == 0){ // If the quality is medium.
-          media_type.qualities_push_back(medium); // Add "medium" quality for this media.
-        }
-        if(strcmp(quality.child_value(), "high") == 0){ // If the quality is high.
-          media_type.qualities_push_back(high); // Add "high" quality for this media.
-        }
-      }
-    }
-    if(strcmp(media_info.name(), "rating") == 0){ // if the node name is "rating".
-      try{
-        rating = strtof(media_info.child_value(), &endptr);
-        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());}
-      }
-      catch(str2f_error &e){
-        cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
-        return -1;
-      }
-      media_type.set_rating(rating);
-    }
-    if(strcmp(media_info.name(), "year") == 0){
-      media_type.set_year(strtol(media_info.child_value(), &endptr, 10)); // try ... catch ICI
-    }
-  }
-  try{
-    service.medias_push_back(media_type);
-  }
-  catch(bad_alloc &e){
-    cerr << argv << ": an exception occurred (cannot add media to streaming-service, reason: " << e.what() << ")" << endl;
-    return -1;
-  }
-  return 0;
-}
+   for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
+     if(strcmp(media_name.name(), "name") == 0){
+       media_type.set_name(media_name.value());
+     }
+   }
+   for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
+     if(strcmp(media_info.name(), "qualities") == 0){
+       for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
+         if(strcmp(quality.child_value(), "low") == 0){
+           media_type.qualities_push_back(low);
+         }
+         if(strcmp(quality.child_value(), "medium") == 0){
+           media_type.qualities_push_back(medium);
+         }
+         if(strcmp(quality.child_value(), "high") == 0){
+           media_type.qualities_push_back(high);
+         }
+       }
+     }
+     if(strcmp(media_info.name(), "rating") == 0){
+       try{
+         rating = strtof(media_info.child_value(), &endptr);
+         if(((rating==FLT_MAX) or (rating==FLT_MIN)) and (errno == ERANGE)){throw str2f_error(media_info.child_value());}
+         if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());}
+
+       }
+       catch(str2f_error &e){
+         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
+         return -1;
+       }
+       media_type.set_rating(rating);
+     }
+     if(strcmp(media_info.name(), "year") == 0){
+       try{
+         l_year = strtol(media_info.child_value(), &endptr, 10);
+         if(endptr==media_info.child_value()){throw str2l_error(media_info.child_value());}
+         if(((l_year>=LONG_MAX) or (l_year<=LONG_MIN)) and (errno == ERANGE)){throw str2l_error(media_info.child_value());}
+       }
+       catch(str2l_error &e){
+         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
+         return -1;
+       }
+       try{
+         if((l_year>INT_MAX) or (l_year<INT_MIN)){throw str2i_error(media_info.child_value());}
+         year=static_cast<int>(l_year);
+       }
+       catch(str2i_error &e){
+         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
+         return -1;
+       }
+       media_type.set_year(year);
+     }
+   }
+   try{
+     service.medias_push_back(media_type);
+   }
+   catch(bad_alloc &e){
+     cerr << argv << ": an exception occurred (cannot add media to streaming-service, reason: " << e.what() << ")" << endl;
+     return -1;
+   }
+   return 0;
+ }
 /**
  * Browses an XML file containing data about a streaming service and the media it broadcasts.
  * \param doc The XML Document.
