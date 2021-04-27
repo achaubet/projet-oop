@@ -291,21 +291,23 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
             if(strlen(input) > 18){
               cerr << argv << ": too many characters for the command" << endl;
             }
-            if(((strtol(command_param, NULL, 10) == 0) or (strtol(command_param, NULL, 10)) > INT_MAX) and (strcmp(command, "mn") != 0)){
-              cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
-            }
             else{
-              if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){
+              if(((strtol(command_param, NULL, 10) == 0) or (strtol(command_param, NULL, 10)) > INT_MAX) and (strcmp(command, "mn") != 0)){
                 cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
               }
               else{
-                switch(cmd_at){
-                  case 0:streaming_service.handle_mn(command_param);break;
-                  case 1:streaming_service.handle_my(strtol(command_param, endPtr, 10));break;
-                  case 2:streaming_service.handle_myge(strtol(command_param, endPtr, 10));break;
-                  case 3:streaming_service.handle_mygt(strtol(command_param, endPtr, 10));break;
-                  case 4:streaming_service.handle_myle(strtol(command_param, endPtr, 10));break;
-                  case 5:streaming_service.handle_mylt(strtol(command_param, endPtr, 10));break;
+                if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){
+                  cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
+                }
+                else{
+                  switch(cmd_at){
+                    case 0:streaming_service.handle_mn(command_param);break;
+                    case 1:streaming_service.handle_my(strtol(command_param, endPtr, 10));break;
+                    case 2:streaming_service.handle_myge(strtol(command_param, endPtr, 10));break;
+                    case 3:streaming_service.handle_mygt(strtol(command_param, endPtr, 10));break;
+                    case 4:streaming_service.handle_myle(strtol(command_param, endPtr, 10));break;
+                    case 5:streaming_service.handle_mylt(strtol(command_param, endPtr, 10));break;
+                  }
                 }
               }
             }
