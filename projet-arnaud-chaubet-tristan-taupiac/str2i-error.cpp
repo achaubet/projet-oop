@@ -3,9 +3,6 @@
  */
 #include "str2i-error.h" // for str2i-error.h
 #include <sstream> // for ostringstream
-#include <exception> // for exception
-#include <string> // for string
-using namespace std;
 /**
  * Constructs a new string to int conversion exception.
  * \param str The string that cannot be converted to a int.
