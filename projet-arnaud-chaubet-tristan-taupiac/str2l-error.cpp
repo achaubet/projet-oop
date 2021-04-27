@@ -2,6 +2,7 @@
  * \file str2l-error.cpp
  */
 #include "str2l-error.h" // for str2l-error.h
+#include <sstream> // for ostringstream
 #include <exception> // for exception
 #include <string> // for string
 using namespace std;
