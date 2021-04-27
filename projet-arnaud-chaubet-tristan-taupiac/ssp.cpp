@@ -14,6 +14,9 @@
 #include <cstring> // for strcmp
 #include <cstdlib> // for strtof
 #include <cstdio> // for fgets
+#include <climits>
+#include <cfloat>
+#include <cerrno>
 using namespace std; // for cout
 using namespace pugi; // for xml_node, xml_attribute and xml_parse_result
 /**
@@ -147,7 +150,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
           }
         }
         if(strcmp(child_node.name(), "web") == 0){ // If the node name is "Web".
-          service.set_web(child_node.child_value()); // Sets the streaming service website. 
+          service.set_web(child_node.child_value()); // Sets the streaming service website.
         }
       }
     }
@@ -265,10 +268,10 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
             cerr << argv << ": Missing parameter for the " << command << " command" << endl;
           }
           else{
-            if(strlen(command_param) >= 18){
+            if(strlen(input) > 18){
               cerr << argv << ": too many characters for the command" << endl;
             }
-            if((strtol(command_param, NULL, 10) == 0) and (strcmp(command, "mn") != 0)){
+            if(((strtol(command_param, NULL, 10) == 0) or (strtol(command_param, NULL, 10)) > INT_MAX) and (strcmp(command, "mn") != 0)){
               cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
             }
             else{
@@ -290,7 +293,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
         }
         else{cerr << argv << ": invalid command" << endl;}
       }
-      else{cerr << argv << ": invalid command" << endl;}
+      //else{cerr << argv << ": invalid command" << endl;}
     }
   }
 }
