@@ -57,8 +57,8 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
     if(strcmp(media_info.name(), "rating") == 0){ // If the node name is "rating".
       try{
         rating = strtof(media_info.child_value(), &endptr);
-        if(errno == ERANGE){throw str2f_error(media_info.child_value());} // If rating is out of range, throw a str2f error.
-        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());} // If rating contains invalid values, throw a str2f error.
+        if(errno == ERANGE){throw str2f_error(media_info.child_value());} // If the rating is out of range, throw a str2f error.
+        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());} // If the rating contains invalid values, throw a str2f error.
       }
       catch(str2f_error &e){ // Catch a str2f_error exception.
         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
@@ -88,7 +88,7 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
     }
   }
   try{
-    service.medias_push_back(media_type); // Add a media to medias.
+    service.medias_push_back(media_type); // Add a media to a streaming service.
   }
   catch(bad_alloc &e){ // Catch a bad alloc exception.
     cerr << argv << ": an exception occurred (cannot add media to streaming-service, reason: " << e.what() << ")" << endl;
@@ -112,22 +112,22 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
   media_t *media_type_ptr = NULL;
 
   node = doc.first_child(); // Sets node to the first child of the XML document.
-  for(; node; node = node.next_sibling()){
-    if(strcmp(node.name(), "streaming-service") == 0){
-      for(service_info = node.first_attribute(); service_info; service_info = service_info.next_attribute()){
-        if(strcmp(service_info.name(), "name") == 0){
-          service.set_name(service_info.value());
+  for(; node; node = node.next_sibling()){ // Browses the nodes of the XML document.
+    if(strcmp(node.name(), "streaming-service") == 0){ // If the node name is "streaming-service".
+      for(service_info = node.first_attribute(); service_info; service_info = service_info.next_attribute()){ // Browses the attributes for a streaming service.
+        if(strcmp(service_info.name(), "name") == 0){ // If the attribute name is "name".
+          service.set_name(service_info.value()); // Sets the streaming service name.
         }
       }
-      for(child_node = node.first_child(); child_node; child_node = child_node.next_sibling()){
-        if(strcmp(child_node.name(), "medias") == 0){
-          for(media = child_node.first_child(); media; media = media.next_sibling()){
-            for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Browses of all medias.
+      for(child_node = node.first_child(); child_node; child_node = child_node.next_sibling()){ // Browses the child nodes of a streaming service.
+        if(strcmp(child_node.name(), "medias") == 0){ // If the node name is "medias".
+          for(media = child_node.first_child(); media; media = media.next_sibling()){ // Browses the child nodes of medias.
+            for(media_type_attr = media.first_attribute(); media_type_attr; media_type_attr = media_type_attr.next_attribute()){ // Browses the attributes of a media node.
               if(strcmp(media_type_attr.value(), "anime") == 0){ // If the media is an anime.
                 try{
                   media_type_ptr = new anime_t; // Try to create an anime.
                 }
-                catch(bad_alloc &e){
+                catch(bad_alloc &e){ // Catch a bad alloc exception.
                   cerr << argv << ": an exception occurred (cannot allocate a new anime, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
@@ -141,7 +141,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
                 try{
                   media_type_ptr = new film_t; // Try to create a film.
                 }
-                catch(bad_alloc &e){
+                catch(bad_alloc &e){ // Catch a bad alloc exception.
                   cerr << argv << ": an exception occurred (cannot allocate a new film, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
@@ -155,7 +155,7 @@ int xml_browse(xml_document &doc, streaming_service_t &service, const char *argv
                 try{
                   media_type_ptr = new series_t; // Try to create a series.
                 }
-                catch(bad_alloc &e){
+                catch(bad_alloc &e){ // Catch a bad alloc exception.
                   cerr << argv <<": an exception occurred (cannot allocate a new series, reason: " << e.what() << ")" << endl;
                   return -1;
                 }
@@ -248,7 +248,7 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
   while(!quit){
     cout << "SSP> ";
     read_stdin(input, argv); // Retrieves the command entered by the user.
-    if(strlen(input)==2){
+    if(strlen(input)==2){ // If the command contains only one character.
       switch(input[0]){
         case 'i':streaming_service.handle_i();break;
         case 'm':streaming_service.handle_m();break;
@@ -260,42 +260,42 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
         default:cerr << argv << ": invalid command" << endl;break;
       }
     }
-    else{
+    else{ // Else, the command contains more than one character.
       if((strlen(input)>2)){
         i = 0;
         cmd_at = -1;
-        if(strlen(command)!=0){clear_char_array(command);}
-        if(strlen(command_param)!=0){clear_char_array(command_param);}
-        while(input[i] != '\n' and input[i] != ' '){
+        if(strlen(command)!=0){clear_char_array(command);} // If the array is not empty, then it must be emptied.
+        if(strlen(command_param)!=0){clear_char_array(command_param);} // If the array is not empty, then it must be emptied.
+        while(input[i] != '\n' and input[i] != ' '){  // Retrieves the first part of the command.
           command[i] = input[i];
           i++;
         }
-        for(j = 0; j < 6; j++){
+        for(j = 0; j < 6; j++){ // Then, we check if the first part of the command is correct.
           if(strcmp(command, command_array[j])==0){cmd_at=j;}
         }
-        if(cmd_at != -1){
+        if(cmd_at != -1){ // If the command is correct.
           l = 0;
           k = strlen(command) + 1;
-          if((static_cast<int>(strlen(input)) > k) and (strlen(input) < 25)){
+          if((static_cast<int>(strlen(input)) > k) and (strlen(input) < 25)){ // Retrieves the second part of the command.
             while((input[k] != '\n')){
               command_param[l] = input[k];
               k++;
               l++;
             }
           }
-          if((command_param[0] == '\0') or (command_param[0] == '\n')){
+          if((command_param[0] == '\0') or (command_param[0] == '\n')){ // Then, we check if the second part of the command is correct.
             cerr << argv << ": Missing parameter for the " << command << " command" << endl;
           }
           else{
-            if(strlen(input) > 18){
+            if(strlen(input) > 18){ // If the command is greater than 18 characters.
               cerr << argv << ": too many characters for the command" << endl;
             }
             else{
-              if(((strtol(command_param, NULL, 10) == 0) or (strtol(command_param, NULL, 10)) > INT_MAX) and (strcmp(command, "mn") != 0)){
+              if(((strtol(command_param, NULL, 10) == 0) or ((strtol(command_param, NULL, 10)) > INT_MAX) or (strtol(command_param, NULL, 10) < INT_MIN))and (strcmp(command, "mn") != 0)){ // If the parameter of the command exceeds the value range or if the parameter is incorrect.
                 cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
               }
               else{
-                if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){
+                if((strtol(command_param, NULL, 10) != 0) and (strcmp(command, "mn") == 0)){ // If the parameter of the mn command is a number.
                   cerr << argv << ": invalid parameter for the " << command <<  " command" << endl;
                 }
                 else{
@@ -334,7 +334,7 @@ int main(int argc, char const *argv[]) {
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
-  
+
   // Read the document passed in parameters.
   result = doc.load_file(argv[1]);
 
