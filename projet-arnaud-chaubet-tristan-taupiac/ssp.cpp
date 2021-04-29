@@ -6,16 +6,15 @@
 #include "anime.h" // for anime_t
 #include "film.h" // for film_t
 #include "series.h" // for series_t
-#include "str2f-error.h" // for str2f-error
-#include "str2i-error.h" // for str2i-error
-#include "str2l-error.h" // for str2l-error
+#include "str2f-error.h" // for str2f_error
+#include "str2i-error.h" // for str2i_error
+#include "str2l-error.h" // for str2l_error
 #include <iostream> // for cout
 #include <pugixml.hpp> // for xml_document, xml_node, xml_attributes and xml_parse_result
 #include <cstring> // for strcmp
-#include <cstdlib> // for strtof
+#include <cstdlib> // for strtof, strtod, strlen
 #include <cstdio> // for fgets
 #include <climits>
-#include <cfloat>
 #include <cerrno>
 using namespace std; // for cout
 using namespace pugi; // for xml_node, xml_attribute and xml_parse_result
@@ -58,7 +57,7 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
     if(strcmp(media_info.name(), "rating") == 0){ // If the node name is "rating".
       try{
         rating = strtof(media_info.child_value(), &endptr);
-        if(((rating==FLT_MAX) or (rating==FLT_MIN)) and (errno == ERANGE)){throw str2f_error(media_info.child_value());} // If rating is out of range, throw a str2f error.
+        if(errno == ERANGE){throw str2f_error(media_info.child_value());} // If rating is out of range, throw a str2f error.
         if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());} // If rating contains invalid values, throw a str2f error.
       }
       catch(str2f_error &e){ // Catch a str2f_error exception.
@@ -335,7 +334,7 @@ int main(int argc, char const *argv[]) {
     cerr << argv[0] << ": invalid number of arguments" << endl;
     return 1;
   }
-
+  
   // Read the document passed in parameters.
   result = doc.load_file(argv[1]);
 
