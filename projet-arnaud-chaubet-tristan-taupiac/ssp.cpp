@@ -36,62 +36,62 @@ int xml_browse_media(xml_node &media, streaming_service_t &service, media_t &med
   int year = 0;
   char *endptr = NULL;
 
-  for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){
-    if(strcmp(media_name.name(), "name") == 0){
-      media_type.set_name(media_name.value());
+  for(media_name = media.first_attribute(); media_name; media_name = media_name.next_attribute()){ // Browses the attributes for a media.
+    if(strcmp(media_name.name(), "name") == 0){ // If the node name is "name".
+      media_type.set_name(media_name.value()); // Sets the media name to media_name.value()
     }
   }
-  for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){
-    if(strcmp(media_info.name(), "qualities") == 0){
-      for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){
-        if(strcmp(quality.child_value(), "low") == 0){
-          media_type.qualities_push_back(low);
+  for(media_info = media.first_child(); media_info; media_info = media_info.next_sibling()){ // Browses the informations for a media.
+    if(strcmp(media_info.name(), "qualities") == 0){ // If the node name is "qualities".
+      for(quality = media_info.first_child(); quality; quality = quality.next_sibling()){ // Browses the qualites of a media.
+        if(strcmp(quality.child_value(), "low") == 0){ // If the quality is low.
+          media_type.qualities_push_back(low); // Add "low" quality for this media.
         }
-        if(strcmp(quality.child_value(), "medium") == 0){
-          media_type.qualities_push_back(medium);
+        if(strcmp(quality.child_value(), "medium") == 0){ // If the quality is medium.
+          media_type.qualities_push_back(medium); // Add "medium" quality for this media.
         }
-        if(strcmp(quality.child_value(), "high") == 0){
-          media_type.qualities_push_back(high);
+        if(strcmp(quality.child_value(), "high") == 0){ // If the quality is high.
+          media_type.qualities_push_back(high); // Add "high" quality for this media.
         }
       }
     }
-    if(strcmp(media_info.name(), "rating") == 0){
+    if(strcmp(media_info.name(), "rating") == 0){ // If the node name is "rating".
       try{
         rating = strtof(media_info.child_value(), &endptr);
-        if(((rating==FLT_MAX) or (rating==FLT_MIN)) and (errno == ERANGE)){throw str2f_error(media_info.child_value());}
-        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());}
+        if(((rating==FLT_MAX) or (rating==FLT_MIN)) and (errno == ERANGE)){throw str2f_error(media_info.child_value());} // If rating is out of range, throw a str2f error.
+        if(endptr==media_info.child_value()){throw str2f_error(media_info.child_value());} // If rating contains invalid values, throw a str2f error.
       }
-      catch(str2f_error &e){
+      catch(str2f_error &e){ // Catch a str2f_error exception.
         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
         return -1;
       }
-      media_type.set_rating(rating);
+      media_type.set_rating(rating); // Sets the media rating to rating.
     }
-    if(strcmp(media_info.name(), "year") == 0){
+    if(strcmp(media_info.name(), "year") == 0){ // If the node name is "year".
       try{
         l_year = strtol(media_info.child_value(), &endptr, 10);
-        if(endptr==media_info.child_value()){throw str2l_error(media_info.child_value());}
-        if(((l_year>=LONG_MAX) or (l_year<=LONG_MIN)) and (errno == ERANGE)){throw str2l_error(media_info.child_value());}
+        if(endptr==media_info.child_value()){throw str2l_error(media_info.child_value());} // If year contains invalid values, throw a str2l error.
+        if(((l_year>=LONG_MAX) or (l_year<=LONG_MIN)) and (errno == ERANGE)){throw str2l_error(media_info.child_value());} // If year is out of range, throw a str2l error.
       }
-      catch(str2l_error &e){
+      catch(str2l_error &e){ // Catch a str2l_error exception.
         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
         return -1;
       }
       try{
-        if((l_year>INT_MAX) or (l_year<INT_MIN)){throw str2i_error(media_info.child_value());}
-        year=static_cast<int>(l_year);
+        if((l_year>INT_MAX) or (l_year<INT_MIN)){throw str2i_error(media_info.child_value());}  // If year is outside the integer range, throw a str2i error.
+        year = static_cast<int>(l_year);
       }
-      catch(str2i_error &e){
+      catch(str2i_error &e){ // Catch a str2i_error exception.
         cerr << argv << ": an exception occurred (" << e.what() << ")" << endl;
         return -1;
       }
-      media_type.set_year(year);
+      media_type.set_year(year); // Sets the media year to year.
     }
   }
   try{
-    service.medias_push_back(media_type);
+    service.medias_push_back(media_type); // Add a media to medias.
   }
-  catch(bad_alloc &e){
+  catch(bad_alloc &e){ // Catch a bad alloc exception.
     cerr << argv << ": an exception occurred (cannot add media to streaming-service, reason: " << e.what() << ")" << endl;
     return -1;
   }
@@ -225,7 +225,7 @@ void read_stdin(char *input, const char *argv){
  * \param array An array of characters.
  */
 void clear_char_array(char *array){
-  int size = strlen(array); // Sets size to the size of the array
+  int size = strlen(array); // Sets size to the size of the array.
   while(size >= 0){
     array[size] = '\0'; // Sets value to '\0'.
     size--;
@@ -315,7 +315,6 @@ void enter_commands(streaming_service_t streaming_service, const char *argv){
         }
         else{cerr << argv << ": invalid command" << endl;}
       }
-      //else{cerr << argv << ": invalid command" << endl;}
     }
   }
 }
